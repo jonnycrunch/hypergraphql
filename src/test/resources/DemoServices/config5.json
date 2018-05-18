@@ -1,0 +1,30 @@
+{
+  "name": "dbpedia",
+  "schema": "src/test/resources/DemoServices/schema1.graphql",
+  "server": {
+    "port": 8081,
+    "graphql": "/graphql",
+    "graphiql": "/graphiql"
+  },
+  "services": [
+    {
+      "id": "dbpedia-sparql",
+      "type": "SPARQLEndpointService",
+      "url": "http://dbpedia.orgx/sparql/",
+      "graph": "http://dbpedia.orgx",
+      "user": "",
+      "password": ""
+    },
+    {
+      "id": "agrovoc-hgql",
+      "type": "HGraphQLService",
+      "url": "http://localhost:8082/graphql"
+    },
+    {
+      "id": "fao-local",
+      "type": "LocalModelSPARQLService",
+      "filepath": "src/test/resources/DemoServices/fao.ttl",
+      "filetype": "TTL"
+    }
+  ]
+}
