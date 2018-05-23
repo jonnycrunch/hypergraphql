@@ -37,7 +37,9 @@ e.g.: `mvn exec:java -Dexec.args="--classpath --config config.json"`
 
 **Gradle**: 
 1. **`gradle build`**
-2. **`gradle execute`**
+2. **`gradle execute [-Pexecute.args="<command line options>"]`** (WIP)
+
+e.g.: `gradle execute -Pexecute.args="--classpath --config config.json"`
 
 
 By deafault, the HyperGraphQL server starts at: 
