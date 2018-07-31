@@ -13,6 +13,7 @@ import org.hypergraphql.services.HGQLQueryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.ModelAndView;
+import spark.Response;
 import spark.Service;
 import spark.template.velocity.VelocityTemplateEngine;
 
@@ -71,14 +72,12 @@ public class Controller {
 
         // CORS
         before((request, response) -> {
-            response.header("Access-Control-Allow-Origin", "*");
             response.header("Access-Control-Allow-Methods", "OPTIONS,GET,POST");
-            response.header("Access-Control-Allow-Headers", "*");
+            setResponseHeaders(response);
         });
 
         hgqlService.options("/*", (req, res) -> {
-            res.header("Access-Control-Allow-Origin", "*");
-            res.header("Access-Control-Allow-Headers", "*");
+            setResponseHeaders(res);
             return "";
         });
 
@@ -89,8 +88,9 @@ public class Controller {
 
             model.put("template", String.valueOf(config.getGraphqlConfig().graphQLPath()));
 
-            res.header("Access-Control-Allow-Origin", "*");
-            res.header("Access-Control-Allow-Headers", "*");
+//            res.header("Access-Control-Allow-Origin", "*");
+//            res.header("Access-Control-Allow-Headers", "*");
+            setResponseHeaders(res);
 
             return new VelocityTemplateEngine().render(
                     new ModelAndView(model, "graphiql.vtl")
@@ -116,13 +116,15 @@ public class Controller {
 
             Map<String, Object> result = service.results(query, mime);
 
+            setResponseHeaders(res);
+
             List<GraphQLError> errors = (List<GraphQLError>) result.get("errors");
             if (!errors.isEmpty()) {
                 res.status(400);
             }
 
-            res.header("Access-Control-Allow-Origin", "*");
-            res.header("Access-Control-Allow-Headers", "*");
+//            res.header("Access-Control-Allow-Origin", "*");
+//            res.header("Access-Control-Allow-Headers", "*");
 
             if (graphQLCompatible) {
                 return mapper.readTree(new ObjectMapper().writeValueAsString(result));
@@ -151,11 +153,18 @@ public class Controller {
 
             res.type(contentType);
 
-            res.header("Access-Control-Allow-Origin", "*");
-            res.header("Access-Control-Allow-Headers", "*");
+//            res.header("Access-Control-Allow-Origin", "*");
+//            res.header("Access-Control-Allow-Headers", "*");
+            setResponseHeaders(res);
 
             return config.getHgqlSchema().getRdfSchemaOutput(mime);
         });
+    }
+
+    private void setResponseHeaders(final Response response) {
+
+        response.header("Access-Control-Allow-Origin", "*");
+        response.header("Access-Control-Allow-Headers", "*");
     }
 
     public void stop() {
