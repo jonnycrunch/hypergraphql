@@ -16,6 +16,8 @@ import spark.ModelAndView;
 import spark.Service;
 import spark.template.velocity.VelocityTemplateEngine;
 
+import static spark.Spark.before;
+
 /**
  * Created by szymon on 05/09/2017.
  *
@@ -67,13 +69,28 @@ public class Controller {
 
         hgqlService = Service.ignite().port(config.getGraphqlConfig().port());
 
-        // get method for accessing the GraphiQL UI
+        // CORS
+        before((request, response) -> {
+            response.header("Access-Control-Allow-Origin", "*");
+            response.header("Access-Control-Allow-Methods", "OPTIONS,GET,POST");
+            response.header("Access-Control-Allow-Headers", "*");
+        });
 
+        hgqlService.options("/*", (req, res) -> {
+            res.header("Access-Control-Allow-Origin", "*");
+            res.header("Access-Control-Allow-Headers", "*");
+            return "";
+        });
+
+        // get method for accessing the GraphiQL UI
         hgqlService.get(config.getGraphqlConfig().graphiQLPath(), (req, res) -> {
 
             Map<String, String> model = new HashMap<>();
 
             model.put("template", String.valueOf(config.getGraphqlConfig().graphQLPath()));
+
+            res.header("Access-Control-Allow-Origin", "*");
+            res.header("Access-Control-Allow-Headers", "*");
 
             return new VelocityTemplateEngine().render(
                     new ModelAndView(model, "graphiql.vtl")
@@ -104,6 +121,9 @@ public class Controller {
                 res.status(400);
             }
 
+            res.header("Access-Control-Allow-Origin", "*");
+            res.header("Access-Control-Allow-Headers", "*");
+
             if (graphQLCompatible) {
                 return mapper.readTree(new ObjectMapper().writeValueAsString(result));
             } else {
@@ -130,6 +150,9 @@ public class Controller {
             String contentType = isRdfContentType ? acceptType : DEFAULT_ACCEPT_TYPE;
 
             res.type(contentType);
+
+            res.header("Access-Control-Allow-Origin", "*");
+            res.header("Access-Control-Allow-Headers", "*");
 
             return config.getHgqlSchema().getRdfSchemaOutput(mime);
         });
