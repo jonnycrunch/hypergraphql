@@ -88,8 +88,6 @@ public class Controller {
 
             model.put("template", String.valueOf(config.getGraphqlConfig().graphQLPath()));
 
-//            res.header("Access-Control-Allow-Origin", "*");
-//            res.header("Access-Control-Allow-Headers", "*");
             setResponseHeaders(res);
 
             return new VelocityTemplateEngine().render(
@@ -123,9 +121,6 @@ public class Controller {
                 res.status(400);
             }
 
-//            res.header("Access-Control-Allow-Origin", "*");
-//            res.header("Access-Control-Allow-Headers", "*");
-
             if (graphQLCompatible) {
                 return mapper.readTree(new ObjectMapper().writeValueAsString(result));
             } else {
@@ -152,9 +147,6 @@ public class Controller {
             String contentType = isRdfContentType ? acceptType : DEFAULT_ACCEPT_TYPE;
 
             res.type(contentType);
-
-//            res.header("Access-Control-Allow-Origin", "*");
-//            res.header("Access-Control-Allow-Headers", "*");
             setResponseHeaders(res);
 
             return config.getHgqlSchema().getRdfSchemaOutput(mime);
